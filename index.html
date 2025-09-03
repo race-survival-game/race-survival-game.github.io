@@ -51,14 +51,34 @@
     </div>
 
     <script>
-      // --- Placeholder for legacy SDK variables ---
-      // This is added to prevent errors from the game build which still tries to reference it.
+      // --- Yandex SDK Stubs ---
+      // These are empty placeholder functions and variables to prevent the game from crashing
+      // when it tries to call functions from the removed Yandex SDK.
       var environmentData = "null";
+      var cloudSaves = "noData"; // Added to fix the "cloudSaves is not defined" error
+      var myGameInstance = null; // To hold the Unity instance reference
+
+      function InitGame() { console.log("SDK STUB: InitGame called"); }
+      function FullAdShow() { console.log("SDK STUB: FullAdShow called"); }
+      function RewardedShow(id) { console.log(`SDK STUB: RewardedShow called for ID: ${id}`); }
+      function StickyAdActivity(show) { console.log(`SDK STUB: StickyAdActivity called with: ${show}`); }
+      function Review() { console.log("SDK STUB: Review called"); }
+      function PromptShow() { console.log("SDK STUB: PromptShow called"); }
+      function SaveCloud(jsonData, flush) { console.log("SDK STUB: SaveCloud called"); }
+      function LoadCloud(sendback) { console.log("SDK STUB: LoadCloud called"); return Promise.resolve("noData"); }
+      function GetPayments(sendback) { console.log("SDK STUB: GetPayments called"); return Promise.resolve("none"); }
+      function BuyPayments(id) { console.log(`SDK STUB: BuyPayments called for ID: ${id}`); }
+      function ConsumePurchase(id) { console.log(`SDK STUB: ConsumePurchase called for ID: ${id}`); }
+      function ConsumePurchases() { console.log("SDK STUB: ConsumePurchases called"); }
+      function InitLeaderboards() { console.log("SDK STUB: InitLeaderboards called"); }
+      function GetLeaderboardScores() { console.log("SDK STUB: GetLeaderboardScores called"); }
+      function SetLeaderboardScores(_name, score) { console.log(`SDK STUB: SetLeaderboardScores called for ${_name}`); }
+      function RequestingEnvironmentData(sendback) { console.log("SDK STUB: RequestingEnvironmentData called"); return Promise.resolve("null"); }
+      function InitPlayer(sendback) { console.log("SDK STUB: InitPlayer called"); return Promise.resolve(JSON.stringify({ playerAuth: "rejected" })); }
+      function OpenAuthDialog() { console.log("SDK STUB: OpenAuthDialog called"); }
+
 
       // --- Unity Game Configuration ---
-      // Note: These filenames are based on the Unity export template for Yandex.
-      // If you re-export your game using the default WebGL template, you will
-      // need to update these file names to match your new build files.
       const buildUrl = "Build";
       const loaderUrl = buildUrl + "/yandexGames.loader.js";
       const config = {
@@ -80,44 +100,42 @@
       const spinner = document.querySelector(".spinner");
 
       // --- UI and Behavior Setup ---
-
-      // Apply mobile-specific styling if needed
       if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
         container.className = "unity-mobile";
       }
-
-      // Set the background image for the loading screen
       loadingCover.style.background = "url('background.jpg') center / cover";
-
-      // Disable the right-click context menu to prevent interrupting gameplay
       document.addEventListener("contextmenu", (event) => event.preventDefault());
       
       // --- Game Loading Logic ---
-
-      // Create a new script element to load the Unity engine
       const script = document.createElement("script");
       script.src = loaderUrl;
-      
-      // Once the loader script is loaded, create the Unity instance
       script.onload = () => {
         createUnityInstance(canvas, config, (progress) => {
-          // This function is called by Unity to update the loading progress bar
           spinner.style.display = "none";
           progressBarEmpty.style.display = "";
           progressBarFull.style.width = `${100 * progress}%`;
         })
           .then((unityInstance) => {
-            // Once the game is fully loaded and ready, hide the loading screen
+            myGameInstance = unityInstance; // Store instance globally for stubs if needed
             loadingCover.style.display = "none";
+            
+            // Fix for the "AudioContext was prevented from starting" warning.
+            // We resume the audio context on the first user interaction.
+            const resumeAudio = () => {
+                if (myGameInstance && myGameInstance.Module.audioContext && myGameInstance.Module.audioContext.state === 'suspended') {
+                    myGameInstance.Module.audioContext.resume();
+                }
+                document.removeEventListener('click', resumeAudio);
+                document.removeEventListener('touchend', resumeAudio);
+            };
+            document.addEventListener('click', resumeAudio);
+            document.addEventListener('touchend', resumeAudio);
+
           })
           .catch((message) => {
-            // Log any errors that occur during the game's initialization
             console.error(message);
-            // You could display an error message to the user here
           });
       };
-      
-      // Append the script to the document's body to start the loading process
       document.body.appendChild(script);
     </script>
   </body>
