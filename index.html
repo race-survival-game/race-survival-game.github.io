@@ -59,6 +59,15 @@
       var playerData = "noData";
       var paymentsData = "none";
       var myGameInstance = null;
+      var ysdk = {
+        features: {
+          LoadingAPI: {
+            ready: () => {
+              console.log("SDK STUB: ysdk.features.LoadingAPI.ready() called");
+            },
+          },
+        },
+      };
     </script>
 
     <script>
