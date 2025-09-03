@@ -54,9 +54,10 @@
       // --- Yandex SDK Stubs ---
       // These are empty placeholder functions and variables to prevent the game from crashing
       // when it tries to call functions from the removed Yandex SDK.
-      var environmentData = "null";
-      var cloudSaves = "noData"; // Added to fix the "cloudSaves is not defined" error
-      var myGameInstance = null; // To hold the Unity instance reference
+      // We attach them to the 'window' object to ensure they are globally available.
+      window.environmentData = "null";
+      window.cloudSaves = "noData"; // Fixed: Explicitly global
+      window.myGameInstance = null; // To hold the Unity instance reference
 
       function InitGame() { console.log("SDK STUB: InitGame called"); }
       function FullAdShow() { console.log("SDK STUB: FullAdShow called"); }
@@ -116,14 +117,14 @@
           progressBarFull.style.width = `${100 * progress}%`;
         })
           .then((unityInstance) => {
-            myGameInstance = unityInstance; // Store instance globally for stubs if needed
+            window.myGameInstance = unityInstance; // Store instance globally for stubs if needed
             loadingCover.style.display = "none";
             
             // Fix for the "AudioContext was prevented from starting" warning.
             // We resume the audio context on the first user interaction.
             const resumeAudio = () => {
-                if (myGameInstance && myGameInstance.Module.audioContext && myGameInstance.Module.audioContext.state === 'suspended') {
-                    myGameInstance.Module.audioContext.resume();
+                if (window.myGameInstance && window.myGameInstance.Module.audioContext && window.myGameInstance.Module.audioContext.state === 'suspended') {
+                    window.myGameInstance.Module.audioContext.resume();
                 }
                 document.removeEventListener('click', resumeAudio);
                 document.removeEventListener('touchend', resumeAudio);
