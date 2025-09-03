@@ -51,16 +51,19 @@
     </div>
 
     <script>
-      // --- Yandex SDK Stubs ---
-      // These are empty placeholder functions and variables to prevent the game from crashing
-      // when it tries to call functions from the removed Yandex SDK.
-      // We attach them to the 'window' object to ensure they are globally available.
-      window.environmentData = "null";
-      window.cloudSaves = "noData"; 
-      window.playerData = "noData"; // Fixed: Explicitly global
-      window.paymentsData = "none"; // Added another common placeholder
-      window.myGameInstance = null; // To hold the Unity instance reference
+      // --- Yandex SDK Global Variable Stubs ---
+      // These are defined first in their own block to ensure they exist globally
+      // before the game's own scripts try to access them.
+      var environmentData = "null";
+      var cloudSaves = "noData"; 
+      var playerData = "noData";
+      var paymentsData = "none";
+      var myGameInstance = null;
+    </script>
 
+    <script>
+      // --- Yandex SDK Function Stubs ---
+      // These are empty placeholder functions to prevent crashes.
       function InitGame() { console.log("SDK STUB: InitGame called"); }
       function FullAdShow() { console.log("SDK STUB: FullAdShow called"); }
       function RewardedShow(id) { console.log(`SDK STUB: RewardedShow called for ID: ${id}`); }
@@ -119,14 +122,14 @@
           progressBarFull.style.width = `${100 * progress}%`;
         })
           .then((unityInstance) => {
-            window.myGameInstance = unityInstance; // Store instance globally for stubs if needed
+            myGameInstance = unityInstance; // Store instance globally
             loadingCover.style.display = "none";
             
             // Fix for the "AudioContext was prevented from starting" warning.
             // We resume the audio context on the first user interaction.
             const resumeAudio = () => {
-                if (window.myGameInstance && window.myGameInstance.Module.audioContext && window.myGameInstance.Module.audioContext.state === 'suspended') {
-                    window.myGameInstance.Module.audioContext.resume();
+                if (myGameInstance && myGameInstance.Module.audioContext && myGameInstance.Module.audioContext.state === 'suspended') {
+                    myGameInstance.Module.audioContext.resume();
                 }
                 document.removeEventListener('click', resumeAudio);
                 document.removeEventListener('touchend', resumeAudio);
