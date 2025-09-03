@@ -56,7 +56,8 @@
       // when it tries to call functions from the removed Yandex SDK.
       // We attach them to the 'window' object to ensure they are globally available.
       window.environmentData = "null";
-      window.cloudSaves = "noData"; // Fixed: Explicitly global
+      window.cloudSaves = "noData"; 
+      window.playerData = "noData"; // Fixed: Explicitly global
       window.myGameInstance = null; // To hold the Unity instance reference
 
       function InitGame() { console.log("SDK STUB: InitGame called"); }
